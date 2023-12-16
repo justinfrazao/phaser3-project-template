@@ -60,3 +60,7 @@ Implement tiers or a formula
 When speeds are low, come up with a formula to set the camera between the car angle and the car's velocity
   Within this set range, the lowest value is the car angle and the highest value is the velocity angle
   Below and above this range, the values are absolute (how it already exists)
+
+While drifting, the car should naturally oversteer
+  This allows for the opposite steering to maintain a drift
+  opposite rotation should be slightly weaker when gameState.cursors.up.isDown
