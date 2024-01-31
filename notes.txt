@@ -62,6 +62,11 @@ When speeds are low, come up with a formula to set the camera between the car an
   Below and above this range, the values are absolute (how it already exists)
 
 
+While drifting, the car should naturally oversteer
+  This allows for the opposite steering to maintain a drift
+  opposite rotation should be slightly weaker when gameState.cursors.up.isDown
+
+
 Going to have to rework how isLoose is determined. Can currently maintain very low speed and keep holding down a direction
 
 Car should have a natural tendency to want to go the way the car is facing when slowing down
