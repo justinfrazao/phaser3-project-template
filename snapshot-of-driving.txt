@@ -1,0 +1,183 @@
+import Phaser from 'phaser';
+
+const gameState = {};
+
+var isLoose = true;
+var leftCount = 0;
+var rightCount = 0;
+var count = 0;
+
+class MyGame extends Phaser.Scene
+{
+  constructor ()
+  {
+    super();
+  }
+  preload ()
+  {
+
+  }
+    
+  create ()
+  {
+    for (let i = 0; i < 100; i++) {
+      for (let j = 0; j < 100; j++) {
+        this.add.rectangle(i*100, j*100, 20, 20, 0x000000);
+      }
+    }
+
+    // gameState.ref = this.add.rectangle(1000, 110, 25, 50, 0x000000);
+    gameState.car = this.matter.add.rectangle(390, 210, 40, 20, { frictionAir: 0.01, friction: 0, chamfer: 2 });
+    // Phaser.Physics.Matter.Matter.Body.setInertia(gameState.car, 500);
+
+    var carGraphics = this.add.graphics();
+    carGraphics.fillStyle(0x000000, 1);
+    carGraphics.fillRoundedRect(-20, -10, 40, 20, 5);
+    this.matter.add.gameObject(carGraphics, gameState.car, true);
+
+
+    gameState.cursors = this.input.keyboard.createCursorKeys();
+
+    this.cameras.main.startFollow(gameState.car.gameObject, true);
+    this.cameras.main.setOrigin(0.5, 0.75);
+  }
+
+  update ()
+  {
+
+    //-0.4200000000000001
+    // console.log(Math.atan2(-0.5746362585969091, 1.2867702311256153))
+    // this.cameras.main.setRotation(-1*(gameState.car.angle+Math.PI/2));
+    if (gameState.car.velocity.y === 0 && gameState.car.velocity.x === 0) {
+      this.cameras.main.setRotation(-1*(gameState.car.angle+Math.PI/2));
+    } else {
+      this.cameras.main.setRotation(-1*(Math.atan2(gameState.car.velocity.y, gameState.car.velocity.x)+Math.PI/2));
+    }
+
+    // console.log(gameState.car.speed)
+    if (gameState.cursors.up.isDown) {
+      console.log(gameState.car)
+      // console.log(Math.sqrt(gameState.car.velocity.x * gameState.car.velocity.x + gameState.car.velocity.y * gameState.car.velocity.y))
+      Phaser.Physics.Matter.Matter.Body.applyForce(gameState.car, gameState.car.position, {x: Math.cos(gameState.car.angle)/3000, y: Math.sin(gameState.car.angle)/3000});
+      // console.log(gameState.car)
+    } else if (gameState.car.speed < 0.5) {
+      Phaser.Physics.Matter.Matter.Body.setSpeed(gameState.car, 0);
+    }
+
+    if (gameState.cursors.down.isDown) {
+      // console.log(gameState.car)
+      // console.log(Math.sqrt(gameState.car.velocity.x * gameState.car.velocity.x + gameState.car.velocity.y * gameState.car.velocity.y))
+      if (gameState.car.speed !== 0) {
+        Phaser.Physics.Matter.Matter.Body.setSpeed(gameState.car, gameState.car.speed*0.984);
+      }
+    }
+    if (gameState.cursors.left.isDown && gameState.cursors.right.isDown) {
+      leftCount = 0;
+      rightCount = 0;
+    } else if (gameState.cursors.left.isDown && gameState.car.speed !== 0) {
+      rightCount = 0;
+      leftCount++;
+      if (isLoose) {
+        Phaser.Physics.Matter.Matter.Body.rotate(gameState.car, -0.02);
+        // here
+        var cos = Math.cos(-0.001), sin = Math.sin(-0.001);
+        Phaser.Physics.Matter.Matter.Body.setVelocity(gameState.car, {x: cos * gameState.car.velocity.x - sin * gameState.car.velocity.y, y: sin * gameState.car.velocity.x + cos * gameState.car.velocity.y})
+      } else {
+        Phaser.Physics.Matter.Matter.Body.rotate(gameState.car, -0.01);
+        var cos = Math.cos(-0.01), sin = Math.sin(-0.01);
+        Phaser.Physics.Matter.Matter.Body.setVelocity(gameState.car, {x: cos * gameState.car.velocity.x - sin * gameState.car.velocity.y, y: sin * gameState.car.velocity.x + cos * gameState.car.velocity.y})
+      }
+    } else if (gameState.cursors.right.isDown && gameState.car.speed !== 0) {
+      leftCount = 0;
+      rightCount++;
+      if (isLoose) {
+        Phaser.Physics.Matter.Matter.Body.rotate(gameState.car, 0.02);
+        // here
+        var cos = Math.cos(0.001), sin = Math.sin(0.001);
+        Phaser.Physics.Matter.Matter.Body.setVelocity(gameState.car, {x: cos * gameState.car.velocity.x - sin * gameState.car.velocity.y, y: sin * gameState.car.velocity.x + cos * gameState.car.velocity.y})
+      } else {
+        Phaser.Physics.Matter.Matter.Body.rotate(gameState.car, 0.01);
+        var cos = Math.cos(0.01), sin = Math.sin(0.01);
+        Phaser.Physics.Matter.Matter.Body.setVelocity(gameState.car, {x: cos * gameState.car.velocity.x - sin * gameState.car.velocity.y, y: sin * gameState.car.velocity.x + cos * gameState.car.velocity.y});
+      }
+    } else {
+      leftCount = 0;
+      rightCount = 0;
+    }
+
+    if (leftCount > 50 || rightCount > 50) isLoose = true;
+
+    // This is an initial attempt to transition isLoose from true to false
+    // if (isLoose) {
+    //   let carAngle = convertAngle(gameState.car.angle);
+    //   let velAngle = Math.atan2(gameState.car.velocity.y, gameState.car.velocity.x);
+    //   let difference = carAngle - velAngle;
+    //   if (Math.abs(difference) < Math.PI/2 || Math.abs(difference) > Math.PI*1.5) {
+    //     if (carAngle > velAngle) {
+    //       if (difference < Math.PI/2 ) {
+    //         // rotateVelocity(gameState.car, -0.005)
+    //         var cos = Math.cos(0.005), sin = Math.sin(0.005);
+    //         Phaser.Physics.Matter.Matter.Body.setVelocity(gameState.car, {x: cos * gameState.car.velocity.x - sin * gameState.car.velocity.y, y: sin * gameState.car.velocity.x + cos * gameState.car.velocity.y});
+      
+    //       } else {
+    //         // rotateVelocity(gameState.car, 0.005)
+    //         var cos = Math.cos(-0.005), sin = Math.sin(-0.005);
+    //         Phaser.Physics.Matter.Matter.Body.setVelocity(gameState.car, {x: cos * gameState.car.velocity.x - sin * gameState.car.velocity.y, y: sin * gameState.car.velocity.x + cos * gameState.car.velocity.y});
+      
+    //       }
+    //     } else {
+    //       if (difference < -Math.PI/2) {
+    //         // rotateVelocity(gameState.car, 0.005)
+    //         var cos = Math.cos(-0.005), sin = Math.sin(-0.005);
+    //         Phaser.Physics.Matter.Matter.Body.setVelocity(gameState.car, {x: cos * gameState.car.velocity.x - sin * gameState.car.velocity.y, y: sin * gameState.car.velocity.x + cos * gameState.car.velocity.y});
+      
+    //       } else {
+    //         // rotateVelocity(gameState.car, -0.005)
+    //         var cos = Math.cos(0.005), sin = Math.sin(0.005);
+    //         Phaser.Physics.Matter.Matter.Body.setVelocity(gameState.car, {x: cos * gameState.car.velocity.x - sin * gameState.car.velocity.y, y: sin * gameState.car.velocity.x + cos * gameState.car.velocity.y});
+      
+    //       }
+    //     }
+    //   }
+    // }
+    
+  }
+}
+
+// function rotateVelocity (body, angle) {
+//   var cos = Math.cos(angle), sin = Math.sin(angle);
+//   Phaser.Physics.Matter.Matter.Body.setVelocity(body, {x: cos * body.velocity.x - sin * body.velocity.y, y: sin * body.x + cos * body.velocity.y});
+// }
+
+function convertAngle(matterBodyAngle)
+{
+  if (matterBodyAngle > 0) {
+    return matterBodyAngle % (2*Math.PI);
+  } else {
+    return (matterBodyAngle % (2*Math.PI)) + (2*Math.PI);
+  }
+}
+
+const config = {
+  type: Phaser.AUTO,
+  parent: 'phaser-example',
+  width: 540,
+  height: 960,
+  backgroundColor: '#E3E3E3',
+  physics: {
+    default: 'matter',
+    matter: {
+        gravity: {
+            y: 0,
+            x: 0
+        },
+        debug: {
+          showVelocity: false
+        },
+        debugBodyColor: 0xffffff
+    }
+  },
+  scene: MyGame
+};
+
+const game = new Phaser.Game(config);

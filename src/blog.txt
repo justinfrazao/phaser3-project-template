@@ -1,0 +1,333 @@
+
+Search
+Write
+Sign up
+
+Sign in
+
+
+
+I made a top-down game version of my blog with Phaser and React
+Pablo Montenegro
+JavaScript in Plain English
+Pablo Montenegro
+
+·
+Follow
+
+Published in
+JavaScript in Plain English
+
+·
+5 min read
+·
+Oct 15, 2021
+446
+
+
+1
+
+
+
+
+Yes, that’s right, there is now a game version of this website. Tired of clicking around boring pages and reading stuff? What about dive into a journey of a top-down RPG-like game and find the blog posts and read them in-game?
+
+
+Ok, but why?
+The idea was born when I added Konami Code to my website, which makes the Matrix source-code show up in the background of the website (try it now), although is super cool, I was thinking it would be even cooler to make the Konami Code open a game or something, and since I already have 2 years of experience in Phaser, I decided to make a silly game just as an MVP.
+
+Around the same days, I found out about the grid-engine Phaser plugin that makes it SO much easier to create a top-down RPG-like game, that I decided to make a game with it, and also because my first “programming” experience date back to 2002 when I was creating games exactly like this with RPG Maker.
+
+From then on the project started to get a little more ambitious, and I thought “what if I show the blog posts in-game?”, all the blog data is available in React via GraphQL anyway, so it shouldn't be too difficult.
+
+Using React as UI for Phaser
+Phaser works by rendering pixels inside a canvas element in the DOM, and it's great, but one of the great features of web development is the power of the DOM and CSS to create great UI elements, and you can't do that with Phaser alone.
+
+The simplest way to use Phaser with React is with a functional component like the one below.
+
+
+And that works fine for most cases, but to make Phaser be able to communicate back and forth with React, like to show a menu item or a dialog box, I will dispatch JavaScript events between Phaser and React.
+
+The best way to do it would be with some sort of state management tool like Flux, but since this is just a very small project, dispatching JavaScript events will work for now. Check the example below how to do it:
+
+
+If you want more details on how to create a React dialog box for your Phaser game, check my blog post on it.
+
+Integrating Phaser with Gatsby
+Gatsby is a static site generator powered by React, but Phaser is a client only package (I mean of course, why would you need Phaser in the backend?), so whenever Gatsby was building my game page I’d get SSR errors because Phaser was trying to access client-side only APIs.
+
+To solve this, I used the React hook useEffect to dynamically import all my Phaser-related modules, as useEffect is only executed on the client-side.
+
+Creating the map
+To create the map I will again use Tiled, which is a FOSS in which you can create maps and use them in almost any game engine.
+
+The tileset I'm using for my map is the Zelda-like tileset created by ArMM1998, which includes indoor and outdoor tilesets.
+
+First I will create the tileset on Tiled and set a property called ge_collide to true on all tiles, I want to have a collision with the hero
+
+
+It’s important to create your map with multiple layers, so some parts can be below and some parts above the hero.
+
+
+After the map is done, I will embed the tileset into the map, and then I can simply import the map and tileset file into my game and load them in Phaser.
+
+Using the grid-engine Phaser plugin
+As I mentioned at the beginning of the post, creating a top-down RPG Maker style game using the grid-engine plugin is easy-peasy, just configure your game to use arcade physics and add grid-engine as a plugin.
+
+Now I can access the plugin via this.gridEngine inside any Phaser game scene. The next step is to create a sprite and move it with the grid-engine plugin.
+
+This code was pretty much copied and pasted from their official documentation page.
+
+As I mentioned before, to make collisions work automatically with a map created on Tiled, just add the property ge_collide set to true for the tiles the hero is supposed to collide with.
+
+Notice that this will make the hero move and collide with objects, but there is no walking animation. To create new sprite animations I will use the this.anims.create() function, and then play that animation every time the grid-engine tells me that the player moved, with the movementStarted, movementStopped and directionChanged events dispatched by the grid-engine.
+
+I go into more detail on how the game mechanics were made in this post.
+
+Getting posts data from Gatsby
+Gatsby makes all your static data available via GraphQL, on my blog, I use the markdown plugin for my posts, so I access my data as follows:
+
+After adding the GraphQL query, all my posts data are available via the data.allMarkdownRemark.edges props.
+
+Now in the game, I can dispatch a JavaScript event asking React to show all my blog posts in a list or something, and then when a blog post is chosen, show it in a Material UI Modal.
+
+Adding it all together
+This is what my GamePage final code looks like:
+
+If you want to know more details about what happens inside the GameScene, check this blog post.
+
+Conclusion
+had a lot of fun creating this game for my blog, and besides that, I learned a lot of new things in Phaser and React. Maybe I can even use part of this code to make a real top-down game :eyes:.
+
+
+Special thanks
+This game would not be possible without the help of some amazing people and their work, so here is my list of special thanks.
+
+photonstorm, for creating Phaser.io.
+Annoraaq, for creating the grid-engine plugin.
+ArMM1998, for the characters sprites and tilesets.
+PixElthen, for the slime sprites.
+pixelartm, for the pirate hat sprites.
+jkjkke, for the Game Over screen background.
+KnoblePersona, for the Main Menu screen background.
+Min, for the open book sprite.
+Originally published at https://pablo.gg.
+
+More content at plainenglish.io
+
+React
+Phaserjs
+JavaScript
+Programming
+Web Development
+446
+
+
+1
+
+
+
+Pablo Montenegro
+JavaScript in Plain English
+Written by Pablo Montenegro
+44 Followers
+·
+Writer for 
+JavaScript in Plain English
+
+https://pablo.gg
+
+Follow
+
+More from Pablo Montenegro and JavaScript in Plain English
+How Webpack Handles Dynamic Imports with Variable Paths
+Pablo Montenegro
+Pablo Montenegro
+
+in
+
+JavaScript in Plain English
+
+How Webpack Handles Dynamic Imports with Variable Paths
+Exploring how webpack handles dynamic imports with variable paths.
+3 min read
+·
+Apr 11, 2022
+68
+
+15 Killer Websites for Web Developers
+fatfish
+fatfish
+
+in
+
+JavaScript in Plain English
+
+15 Killer Websites for Web Developers
+99.9% of developers don’t know all of them.
+
+·
+4 min read
+·
+Aug 9
+2.8K
+
+29
+
+I Almost Lost My Year-End Bonus Because of JSON.stringify
+fatfish
+fatfish
+
+in
+
+JavaScript in Plain English
+
+I Almost Lost My Year-End Bonus Because of JSON.stringify
+What a sad story
+
+·
+5 min read
+·
+Dec 4
+730
+
+14
+
+Building a dynamic form from a JSON schema with Formik
+Pablo Montenegro
+Pablo Montenegro
+
+in
+
+JavaScript in Plain English
+
+Building a dynamic form from a JSON schema with Formik
+Around 6 months ago, Gatsby v3 was released, and I was already super hyped to upgrade this blog to v3 and start using incremental builds…
+3 min read
+·
+Oct 23, 2021
+46
+
+See all from Pablo Montenegro
+See all from JavaScript in Plain English
+Recommended from Medium
+How to integrate Phaser into React
+Leo Kuo
+Leo Kuo
+
+How to integrate Phaser into React
+The benefits and how to communicate between Phaser and React/Redux
+6 min read
+·
+Jul 2
+54
+
+PART I: Integrating Unity Games to React Native [Android]
+Rushit Jivani
+Rushit Jivani
+
+in
+
+Level Up Coding
+
+PART I: Integrating Unity Games to React Native [Android]
+Embedding unity game with React Native + Poker! 🃏
+8 min read
+·
+Aug 9
+61
+
+2
+
+Lists
+
+
+
+General Coding Knowledge
+20 stories
+·
+723 saves
+
+
+Stories to Help You Grow as a Software Developer
+19 stories
+·
+666 saves
+
+
+
+Coding & Development
+11 stories
+·
+346 saves
+AI-generated image of a cute tiny robot in the backdrop of ChatGPT’s logo
+
+
+ChatGPT
+23 stories
+·
+355 saves
+React Three Fiber Third Person Control
+Mohamd Almahdi
+Mohamd Almahdi
+
+React Three Fiber Third Person Control
+Camera Control for Creating Immersive Scenes and Gaming Experiences.
+11 min read
+·
+Jul 27
+102
+
+2
+
+Title: Enlightening 3D Worlds: Mastering Lighting Techniques in Three.js
+althaf khan
+althaf khan
+
+Title: Enlightening 3D Worlds: Mastering Lighting Techniques in Three.js
+🌟 Welcome to a new dimension of 3D web development! In this article, we’re diving deep into the captivating realm of lighting in Three.js…
+2 min read
+·
+Aug 8
+Create animated Shaders with React Fiber using Threejs
+Nabendu Biswas
+Nabendu Biswas
+
+Create animated Shaders with React Fiber using Threejs
+In this post, we are going to create an hover image transition in React Fiber using Threejs. Here, we are going to show nice animations…
+4 min read
+·
+Sep 9
+8
+
+Behind the Scenes: Creating a Point-and-Click Game Experience
+Scenario
+Scenario
+
+Behind the Scenes: Creating a Point-and-Click Game Experience
+In the point-and-click genre, the creation of each scene is not just an artistic endeavor but a technical challenge. Today, we’re diving…
+3 min read
+·
+Dec 19
+17
+
+1
+
+See more recommendations
+Help
+
+Status
+
+About
+
+Careers
+
+Blog
+
+Privacy
+
+Terms
+
+Text to speech
+
+Teams

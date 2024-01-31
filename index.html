@@ -5,5 +5,13 @@
     <title>Phaser 3 Project Template</title>
   </head>
   <body>
+    <script>
+      const start_function = () => {
+        console.log('wassup')
+        const evt = new CustomEvent('dialog', {detail: 'please please please'});
+        window.dispatchEvent(evt);
+      }
+      window.addEventListener('start', start_function);
+    </script>
   </body>
 </html>

@@ -60,3 +60,132 @@ Implement tiers or a formula
 When speeds are low, come up with a formula to set the camera between the car angle and the car's velocity
   Within this set range, the lowest value is the car angle and the highest value is the velocity angle
   Below and above this range, the values are absolute (how it already exists)
+
+
+Going to have to rework how isLoose is determined. Can currently maintain very low speed and keep holding down a direction
+
+Car should have a natural tendency to want to go the way the car is facing when slowing down
+  If angle between velocity and car direction is less than 90 degrees (PI/2)
+
+Turning opposite direction to maintain drift is a must
+
+Maybe the car is always loose
+
+
+More rotation at low speed turning
+
+Phaser.js works great in this regard. It is easy to make it work with react/next using events.
+
+Dispatch JavaScript events between Phaser and React 
+
+
+
+To generate a new chunk of map, feed the last chunk to the web worker
+After web worker is called, delete older chunks (1 older than the chunk fed to the web worker) to not intersect
+When event to add new chunk is triggered, add to world
+
+
+
+this.points = [
+    50, 300,
+    164, 246,
+    274, 342,
+    412, 257,
+    522, 341,
+    664, 264
+];
+this.curve = new Phaser.Curves.Spline(this.points);
+
+//  Get 20 points from the curve
+this.points = this.curve.getSpacedPoints(20);
+
+
+
+
+
+
+I absolutely need to handle destroying old game objects
+
+
+
+
+
+Spline point generation
+first X splines are generated in the create method
+first spline starts at 0,0
+all subsequent splines start on the last point of the previous spline
+
+gameState should create variables
+X variables to hold the arrays
+X variables to track if that array has been overlapped with yet
+
+set each new spline an overlap condition (using the array of GameObjects)
+  this should spawn a web worker to create a new spline
+  this should only run once
+
+
+Map generation process
+loop 10 times (~13 seconds) into one array
+On overlap checks, add the flags first so the if statements can short circuit
+when overlapping with the first quarter, reset the overlap flags
+when overlapping with the second quarter, delete previous batch (destroy the arrays over four frames) and reset the overlap flags
+when overlapping with the third quarter, generate 10 more and reset the overlap flags
+when overlapping with the final quarter, reset the overlap flags
+
+
+OVERLAP LOGIC
+Get rid of: if (!this.matter.overlap(gameState.car))
+and instead configure a massive if else chain using the following variables
+note that car can overlap with multiple quarters at once
+firstBatch.firstFlag
+firstBatch.firstActive
+firstBatch.firstArray
+firstBatch.secondFlag
+firstBatch.secondActive
+firstBatch.secondArray
+firstBatch.thirdFlag
+firstBatch.thirdActive
+firstBatch.thirdArray
+secondBatch.firstFlag
+secondBatch.firstActive
+secondBatch.firstArray
+secondBatch.secondFlag
+secondBatch.secondActive
+secondBatch.secondArray
+secondBatch.thirdFlag
+secondBatch.thirdActive
+secondBatch.thirdArray
+two thirds will be active at all times, therefore only checking 3/8 of all gameObjects for overlap
+when overlapping a new section, the next section becomes active and the previous section becomes inactive
+Once inside an overlap section, check the flag to see if an action needs to be taken
+These actions can include destroying a previous batch, spawning a new webworker, and setting flag and active variables
+Game Over status will exist in an else {} if no sections are overlapped
+
+batchFlag to know which sequence we are on
+
+
+function to render the three spline arrays
+function to delete the previous batch
+
+
+First generate call happens in create(), so this is where the initial 400 line spline should occur
+All subsequent generate calls will occur in a web worker
+
+rebinding of keys
+
+
+create a function that handles the generation and setup of the path and gameObjects
+
+
+left and right should only rotate the velocity if the car angle is between the velocity direction and 90 degrees to the side of the turn
+
+implement generate and delete logic
+
+
+Look one more time into creating a curve game object into a matter body
+After that convert the current circle strategy into a chain strategy
+matter.js examples
+bridge
+chains
+sensors
+stats
