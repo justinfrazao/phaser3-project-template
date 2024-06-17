@@ -95,20 +95,19 @@ class MyGame extends Phaser.Scene
     const curvePoints = curve.getDistancePoints(15);
 
 
-    for (let k = 0; k < curvePoints.length; k++) {
+    for (let k = 0; k < curvePoints.length/2; k++) {
       let oneQuarter = curvePoints.length/4;
       if (k < oneQuarter) {
         firstBatch.firstArray.push(this.matter.add.gameObject(this.add.circle(curvePoints[k].x, curvePoints[k].y, 80, 0x000000), this.matter.add.circle(curvePoints[k].x, curvePoints[k].y, 80, {isStatic: true}), true));
-      } else if (k < oneQuarter * 2) {
-        firstBatch.secondArray.push(this.matter.add.gameObject(this.add.circle(curvePoints[k].x, curvePoints[k].y, 80, 0x008000), this.matter.add.circle(curvePoints[k].x, curvePoints[k].y, 80, {isStatic: true}), true));
-      } else if (k < oneQuarter * 3) {
-        firstBatch.thirdArray.push(this.matter.add.gameObject(this.add.circle(curvePoints[k].x, curvePoints[k].y, 80, 0xFF0000), this.matter.add.circle(curvePoints[k].x, curvePoints[k].y, 80, {isStatic: true}), true));
       } else {
-        firstBatch.fourthArray.push(this.matter.add.gameObject(this.add.circle(curvePoints[k].x, curvePoints[k].y, 80, 0x0000FF), this.matter.add.circle(curvePoints[k].x, curvePoints[k].y, 80, {isStatic: true}), true));
-      }
+        firstBatch.secondArray.push(this.matter.add.gameObject(this.add.circle(curvePoints[k].x, curvePoints[k].y, 80, 0x008000), this.matter.add.circle(curvePoints[k].x, curvePoints[k].y, 80, {isStatic: true}), true));
+      } 
+      // else if (k < oneQuarter * 3) {
+      //   firstBatch.thirdArray.push(this.matter.add.gameObject(this.add.circle(curvePoints[k].x, curvePoints[k].y, 80, 0xFF0000), this.matter.add.circle(curvePoints[k].x, curvePoints[k].y, 80, {isStatic: true}), true));
+      // } else {
+      //   firstBatch.fourthArray.push(this.matter.add.gameObject(this.add.circle(curvePoints[k].x, curvePoints[k].y, 80, 0x0000FF), this.matter.add.circle(curvePoints[k].x, curvePoints[k].y, 80, {isStatic: true}), true));
+      // }
     }
-
-
 
 
     gameState.cursors = this.input.keyboard.createCursorKeys();
@@ -130,6 +129,10 @@ class MyGame extends Phaser.Scene
         firstBatch.secondFlag = true;
         firstBatch.secondActive = true;
         secondBatch.thirdActive = false;
+        secondBatch.thirdArray.forEach(element => {
+          element.destroy();
+        });
+        secondBatch.thirdArray = [];
       }
     } else if (firstBatch.secondActive && this.matter.overlap(gameState.car, firstBatch.secondArray)) {
       if (firstBatch.secondFlag) {
@@ -137,6 +140,10 @@ class MyGame extends Phaser.Scene
         firstBatch.thirdFlag = true;
         firstBatch.thirdActive = true;
         secondBatch.fourthActive = false;
+        secondBatch.fourthArray.forEach(element => {
+          element.destroy();
+        });
+        secondBatch.fourthArray = [];
       }
     } else if (firstBatch.thirdActive && this.matter.overlap(gameState.car, firstBatch.thirdArray)) {
       if (firstBatch.thirdFlag) {
@@ -144,6 +151,10 @@ class MyGame extends Phaser.Scene
         firstBatch.fourthFlag = true;
         firstBatch.fourthActive = true;
         firstBatch.firstActive = false;
+        firstBatch.firstArray.forEach(element => {
+          element.destroy();
+        });
+        firstBatch.firstArray = [];
         //add the generate handler function
       }
     } else if (firstBatch.fourthActive && this.matter.overlap(gameState.car, firstBatch.fourthArray)) {
@@ -152,6 +163,10 @@ class MyGame extends Phaser.Scene
         secondBatch.firstFlag = true;
         secondBatch.firstActive = true;
         firstBatch.secondActive = false;
+        firstBatch.secondArray.forEach(element => {
+          element.destroy();
+        });
+        firstBatch.secondArray = [];
       }
     } else if (secondBatch.firstActive && this.matter.overlap(gameState.car, secondBatch.firstArray)) {
       if (secondBatch.firstFlag) {
@@ -159,6 +174,10 @@ class MyGame extends Phaser.Scene
         secondBatch.secondFlag = true;
         secondBatch.secondActive = true;
         firstBatch.thirdActive = false;
+        firstBatch.thirdArray.forEach(element => {
+          element.destroy();
+        });
+        firstBatch.thirdArray = [];
       }
     } else if (secondBatch.secondActive && this.matter.overlap(gameState.car, secondBatch.firstArray)) {
       if (secondBatch.secondFlag) {
@@ -166,6 +185,10 @@ class MyGame extends Phaser.Scene
         secondBatch.thirdFlag = true;
         secondBatch.thirdActive = true;
         firstBatch.fourthActive = false;
+        firstBatch.fourthArray.forEach(element => {
+          element.destroy();
+        });
+        firstBatch.fourthArray = [];
       }
     } else if (secondBatch.thirdActive && this.matter.overlap(gameState.car, secondBatch.firstArray)) {
       if (secondBatch.thirdFlag) {
@@ -173,6 +196,10 @@ class MyGame extends Phaser.Scene
         secondBatch.fourthFlag = true;
         secondBatch.fourthActive = true;
         secondBatch.firstActive = false;
+        secondBatch.firstArray.forEach(element => {
+          element.destroy();
+        });
+        secondBatch.firstArray = [];
       }
     } else if (secondBatch.fourthActive && this.matter.overlap(gameState.car, secondBatch.fourthArray)) {
       if (secondBatch.fourthFlag) {
@@ -180,6 +207,10 @@ class MyGame extends Phaser.Scene
         firstBatch.firstFlag = true;
         firstBatch.firstActive = true;
         secondBatch.secondActive = false;
+        secondBatch.secondArray.forEach(element => {
+          element.destroy();
+        });
+        secondBatch.secondArray = [];
       }
     } else {
       console.log('not over' + count);
@@ -207,14 +238,12 @@ class MyGame extends Phaser.Scene
       //   this.matter.add.gameObject(this.add.circle(curvePoints[k].x, curvePoints[k].y, 100, 0x000000), circle, true);
       // }
     }
-    if (count === 600) {
-      // gameState.firstBatch.forEach(element => {
+    if (count === 100) {
+      // console.log(firstBatch.firstArray[6]);
+      // firstBatch.firstArray.forEach(element => {
       //   element.destroy();
       // });
-      // gameState.firstBatch = [];
-
-
-
+      // firstBatch.firstArray = [];
     }
 
 
